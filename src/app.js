@@ -21,7 +21,7 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: true, // allow all origins
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true
     }
@@ -52,7 +52,9 @@ app.set('userSocketMap', userSocketMap);
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+        callback(null, true); // allow all origins (มือถือ, IP, localhost)
+    },
     credentials: true
 }));
 app.use(express.json());
@@ -75,7 +77,7 @@ const PORT = process.env.PORT || 5000;
 
 db.sequelize.sync({ force: false })
     .then(() => {
-        server.listen(PORT, () => {
+        server.listen(PORT, '0.0.0.0', () => {
             console.log(`Server running on port ${PORT}`);
             console.log('Database connected and synchronized!');
         });
